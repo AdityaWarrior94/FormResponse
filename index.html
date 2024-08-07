@@ -171,23 +171,31 @@
   const feedback = document.getElementById("feedback");
   feedback.style.display = "block";
 
-  const formData = new FormData(event.target);
-  fetch("https://script.google.com/macros/s/AKfycbymt97pFPYabkouUVJxHap0qrwG2903aSM1BidaX5I3mN2LCeFziH4wAi1Rq6gKleOc/exec", {
-    method: "POST",
-    body: formData
-  })
-  .then(response => response.json())
-  .then(result => {
-    feedback.innerText = "Form submitted successfully!";
-    setTimeout(() => {
-      feedback.style.display = "none";
-      event.target.reset();
-    }, 2000);
-  })
-  .catch(error => {
-    feedback.innerText = "Error submitting the form. Please try again.";
-    setTimeout(() => {
-      feedback.style.display = "none";
-    }, 2000);
-  });
+  const formData = new FormData();
+const fileInput = document.getElementById("fileUpload");
+const files = fileInput.files;
+
+for (let i = 0; i < files.length; i++) {
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const base64 = event.target.result.split(',')[1]; // Remove the 'data:*/*;base64,' part
+    formData.append(`fileUpload`, base64);
+    formData.append(`fileUploadMimeType${i}`, files[i].type);
+    formData.append(`fileUploadFileName${i}`, files[i].name);
+  };
+  reader.readAsDataURL(files[i]);
+}
+
+// Add other form fields to formData here
+
+fetch("https://script.google.com/macros/s/AKfycbyrsykoKyPqCIlf9djvgcB3XMcFqa8UrJ3Pg2ijlOG3jiW-kNHde4_fXRmQVy6c3PQ7/exec", {
+  method: "POST",
+  body: formData
+})
+.then(response => response.json())
+.then(result => {
+  console.log("Form submitted successfully", result);
+})
+.catch(error => {
+  console.error("Error submitting form:", error);
 });
