@@ -17,7 +17,6 @@
       min-height: 100vh;
     }
 
-
     .form-card1 {
       background-image: linear-gradient(163deg, #64ffda 0%, #64ffda 100%);
       border-radius: 22px;
@@ -28,7 +27,6 @@
       margin: 20px;
     }
 
-
     .form-card2 {
       background-color: #171717;
       border-radius: 20px;
@@ -36,12 +34,10 @@
       transition: all 0.2s;
     }
 
-
     .form-card2:hover {
       transform: scale(0.98);
       border-radius: 20px;
     }
-
 
     .form-heading {
       text-align: center;
@@ -50,11 +46,9 @@
       font-size: 1.5em;
     }
 
-
     .form-field {
       margin-bottom: 15px;
     }
-
 
     .input-field {
       width: 100%;
@@ -64,7 +58,6 @@
       background: none;
       color: #64ffda;
     }
-
 
     .sendMessage-btn {
       cursor: pointer;
@@ -78,13 +71,11 @@
       transition: all ease-in-out 0.3s;
     }
 
-
     .sendMessage-btn:hover {
       background-color: #000;
       color: #64ffda;
       box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
     }
-
 
     .submission-feedback {
       text-align: center;
@@ -101,11 +92,9 @@
       <form class="form" id="doubtForm">
         <p class="form-heading">Ask a Doubt?</p>
 
-
         <div class="form-field">
           <input required placeholder="Name" class="input-field" type="text" name="name" />
         </div>
-
 
         <div class="form-field">
           <div style="display: flex;">
@@ -119,11 +108,9 @@
               <option value="+968">Oman (+968)</option>
             </select>
 
-
             <input required placeholder="Login Number" class="input-field" type="number" style="width: 70%;" name="loginNumber" />
           </div>
         </div>
-
 
         <div class="form-field">
           <select required class="input-field" name="batch">
@@ -136,7 +123,6 @@
           </select>
         </div>
 
-
         <div class="form-field">
           <select required class="input-field" name="section">
             <option value="" disabled selected>Select Section</option>
@@ -145,7 +131,6 @@
             <option value="C">C</option>
           </select>
         </div>
-
 
         <div class="form-field">
           <select required class="input-field" name="subject">
@@ -162,17 +147,14 @@
           </select>
         </div>
 
-
         <div class="form-field">
           <textarea required placeholder="Doubt in Detail" cols="30" rows="3" class="input-field" name="doubtDetail"></textarea>
         </div>
-
 
         <div class="form-field">
           <label for="fileUpload">Upload Files (Images or PDFs):</label>
           <input id="fileUpload" name="fileUpload" class="input-field" type="file" accept=".jpg,.jpeg,.png,.pdf" multiple required />
         </div>
-
 
         <button class="sendMessage-btn" type="submit">Submit</button>
         <div class="submission-feedback" id="feedback">Submitting...</div>
@@ -180,16 +162,26 @@
     </div>
   </div>
 
-
   <script>
-    document.getElementById("doubtForm").addEventListener("submit", function(event) {
+    document.getElementById("doubtForm").addEventListener("submit", async function(event) {
       event.preventDefault();
       const feedback = document.getElementById("feedback");
       feedback.style.display = "block";
 
-
       const formData = new FormData(event.target);
-      fetch("https://script.google.com/macros/s/AKfycbw-OXS0nR3k5YBLnUJ5dlwMuiVyDihbkEKQXjj4bl9Fhti7nHa72Ro-AkKGsOGHPC9T/exec", {
+
+      // Handle file upload
+      const fileUpload = document.getElementById("fileUpload").files;
+      if (fileUpload.length > 0) {
+        const filePromises = [];
+        for (let i = 0; i < fileUpload.length; i++) {
+          filePromises.push(convertFileToBase64(fileUpload[i]));
+        }
+        const filesBase64 = await Promise.all(filePromises);
+        formData.append('fileUpload', JSON.stringify(filesBase64));
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbzsdV_tf_qnnBs7t25sUShlpN8llFFvnCSSEQdQ0A363FdC6b4LlN7JjV7ZJoOtQmBI/exec", {
         method: "POST",
         body: formData
       })
@@ -208,6 +200,15 @@
         }, 2000);
       });
     });
+
+    function convertFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.replace(/^data:.+;base64,/, ''));
+        reader.onerror = error => reject(error);
+      });
+    }
   </script>
 </body>
 </html>
