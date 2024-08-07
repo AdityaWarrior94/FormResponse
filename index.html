@@ -171,31 +171,60 @@
   const feedback = document.getElementById("feedback");
   feedback.style.display = "block";
 
-  const formData = new FormData();
-const fileInput = document.getElementById("fileUpload");
-const files = fileInput.files;
+  const formData = new FormData(event.target); // Automatically append all form fields
 
-for (let i = 0; i < files.length; i++) {
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const base64 = event.target.result.split(',')[1]; // Remove the 'data:*/*;base64,' part
-    formData.append(`fileUpload`, base64);
-    formData.append(`fileUploadMimeType${i}`, files[i].type);
-    formData.append(`fileUploadFileName${i}`, files[i].name);
-  };
-  reader.readAsDataURL(files[i]);
-}
+  const fileInput = document.getElementById("fileUpload");
+  const files = fileInput.files;
 
-// Add other form fields to formData here
+  if (files.length > 0) {
+    let filesProcessed = 0;
 
-fetch("https://script.google.com/macros/s/AKfycbyrsykoKyPqCIlf9djvgcB3XMcFqa8UrJ3Pg2ijlOG3jiW-kNHde4_fXRmQVy6c3PQ7/exec", {
-  method: "POST",
-  body: formData
-})
-.then(response => response.json())
-.then(result => {
-  console.log("Form submitted successfully", result);
-})
-.catch(error => {
-  console.error("Error submitting form:", error);
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      
+      reader.onload = function(event) {
+        const base64 = event.target.result.split(',')[1]; // Remove the 'data:*/*;base64,' part
+        formData.append(`fileUpload`, base64);
+        formData.append(`fileUploadMimeType${i}`, files[i].type);
+        formData.append(`fileUploadFileName${i}`, files[i].name);
+
+        filesProcessed++;
+
+        if (filesProcessed === files.length) {
+          // All files are processed, now submit the form
+          submitForm(formData);
+        }
+      };
+
+      reader.readAsDataURL(files[i]);
+    }
+  } else {
+    // No files to process, submit the form immediately
+    submitForm(formData);
+  }
 });
+
+function submitForm(formData) {
+  fetch("https://script.google.com/macros/s/AKfycbyrsykoKyPqCIlf9djvgcB3XMcFqa8UrJ3Pg2ijlOG3jiW-kNHde4_fXRmQVy6c3PQ7/exec", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.json())
+  .then(result => {
+    console.log("Form submitted successfully", result);
+    const feedback = document.getElementById("feedback");
+    feedback.innerText = "Form submitted successfully!";
+    setTimeout(() => {
+      feedback.style.display = "none";
+      document.getElementById("doubtForm").reset();
+    }, 2000);
+  })
+  .catch(error => {
+    console.error("Error submitting form:", error);
+    const feedback = document.getElementById("feedback");
+    feedback.innerText = "Error submitting the form. Please try again.";
+    setTimeout(() => {
+      feedback.style.display = "none";
+    }, 2000);
+  });
+}
