@@ -169,7 +169,36 @@
       feedback.style.display = "block";
 
       const formData = new FormData(event.target);
-      fetch("https://script.google.com/macros/s/AKfycbzlCglfY-FxPyqqLCuWrPttYyWAvQ1J24CuT4WqjzxlFUJkFZXDwR3wGS4wiat2uETl/exec", {
+      fetch("document.getElementById("doubtForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  const feedback = document.getElementById("feedback");
+  feedback.style.display = "block";
+
+  const formData = new FormData(event.target);
+  fetch("https://script.google.com/macros/s/AKfycbzlCglfY-FxPyqqLCuWrPttYyWAvQ1J24CuT4WqjzxlFUJkFZXDwR3wGS4wiat2uETl/exec", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.result === "success") {
+      feedback.innerText = "Form submitted successfully!";
+    } else {
+      feedback.innerText = "Error submitting the form: " + result.error;
+    }
+    setTimeout(() => {
+      feedback.style.display = "none";
+      event.target.reset();
+    }, 2000);
+  })
+  .catch(error => {
+    feedback.innerText = "Error submitting the form. Please try again.";
+    setTimeout(() => {
+      feedback.style.display = "none";
+    }, 2000);
+  });
+});
+", {
         method: "POST",
         body: formData
       })
