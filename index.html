@@ -179,9 +179,10 @@
         }
         const filesBase64 = await Promise.all(filePromises);
         formData.append('fileUpload', JSON.stringify(filesBase64));
+        formData.append('fileNames', JSON.stringify(Array.from(fileUpload).map(file => file.name))); // Add filenames
       }
 
-      fetch("https://script.google.com/macros/s/AKfycbxDJjUoEjC35CGZKUlJfp0JyigFm4AIEWXz6Iw7FV7LFXJ4BCNMy2fN9L3Awx19gqvt/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbwzGvdGTCyXNl36Lpa-ufGcx89oJa7sLYLp8bPgTDGtsu3gN8bT2amqOCTt-ienaXkc/exec", {
         method: "POST",
         body: formData
       })
