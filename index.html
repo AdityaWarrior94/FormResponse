@@ -89,7 +89,10 @@
 <body>
   <div class="form-card1">
     <div class="form-card2">
-      <form class="form" id="doubtForm">
+      <form class="form" id="doubtForm" enctype="multipart/form-data">
+  <!-- Form fields -->
+</form>
+
         <p class="form-heading">Ask a Doubt?</p>
 
         <div class="form-field">
@@ -164,30 +167,27 @@
 
   <script>
     document.getElementById("doubtForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      const feedback = document.getElementById("feedback");
-      feedback.style.display = "block";
+  event.preventDefault();
+  const feedback = document.getElementById("feedback");
+  feedback.style.display = "block";
 
-      const formData = new FormData(event.target);
-      fetch("https://script.google.com/macros/s/AKfycbymt97pFPYabkouUVJxHap0qrwG2903aSM1BidaX5I3mN2LCeFziH4wAi1Rq6gKleOc/exec", {
-        method: "POST",
-        body: formData
-      })
-      .then(response => response.json())
-      .then(result => {
-        feedback.innerText = "Form submitted successfully!";
-        setTimeout(() => {
-          feedback.style.display = "none";
-          event.target.reset();
-        }, 2000);
-      })
-      .catch(error => {
-        feedback.innerText = "Error submitting the form. Please try again.";
-        setTimeout(() => {
-          feedback.style.display = "none";
-        }, 2000);
-      });
-    });
-  </script>
-</body>
-</html>
+  const formData = new FormData(event.target);
+  fetch("https://script.google.com/macros/s/AKfycbymt97pFPYabkouUVJxHap0qrwG2903aSM1BidaX5I3mN2LCeFziH4wAi1Rq6gKleOc/exec", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.json())
+  .then(result => {
+    feedback.innerText = "Form submitted successfully!";
+    setTimeout(() => {
+      feedback.style.display = "none";
+      event.target.reset();
+    }, 2000);
+  })
+  .catch(error => {
+    feedback.innerText = "Error submitting the form. Please try again.";
+    setTimeout(() => {
+      feedback.style.display = "none";
+    }, 2000);
+  });
+});
